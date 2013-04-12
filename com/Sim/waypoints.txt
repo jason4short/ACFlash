@@ -1,0 +1,148 @@
+			// ------------------------------------------------------
+			// Setup waypoints
+			// ------------------------------------------------------
+
+			/*
+			// The Baseball fields at GGPark
+			wp_manager.clearWaypoints();
+			wp_manager.lat_offset = 377679650;
+			wp_manager.lng_offset = -1224646780;
+			wp_manager.addWaypoint(22, 1, 0, 600, 377679648, -1224646784);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 377679648, -1224646784);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 377672224, -1224645760);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 377678272, -1224646656);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 377679712, -1224639616);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 377677344, -1224652288);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 377679200, -1224646656);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 377672960, -1224645120);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 377672896, -1224649472);
+			wp_manager.addWaypoint(16, 1, 0, 500, 377679168, -1224646656);
+			wp_manager.addWaypoint(MAV_CMD_NAV_LAND, 1, 0, 0, 0, 0);
+			//*/
+
+
+ 
+			wp_manager.clearWaypoints();
+			wp_manager.lat_offset = 400728660;
+			wp_manager.lng_offset = -1052305390;
+			wp_manager.alt_offset = 1583;
+			
+			
+			wp_manager.addWaypoint(22, 1, 0, 200, 400728660, -1052305390);	// takeoff
+			wp_manager.addWaypoint(16, 1, 0, 700, 400731700, -1052306000); // clear trees				
+			wp_manager.addWaypoint(16, 1, 5, 700, 400758000, -1052333000); // dropoff // 5 seconds loiter
+			wp_manager.addWaypoint(183, 1, 6, 1000, 0, 0); // servo
+			wp_manager.addWaypoint(16, 1, 0, 700, 400727000, -1052313000);	// back to land
+			wp_manager.addWaypoint(16, 1, 0, 330, 400727000, -1052313000);	// descend
+			wp_manager.addWaypoint(16, 1, 0, 330, 400728660, -1052305390); // Home
+			wp_manager.addWaypoint(21, 1, 0, 0, 0, 0);
+
+			/*
+			// A Basic 40m square for testing
+			wp_manager.clearWaypoints();
+			wp_manager.addWaypoint(22, 1, 0, 1200, 0, 0);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 4000, 0);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 4000, 4000);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 0, 4000);
+			wp_manager.addWaypoint(16, 1, 0, 1200, 0, 0);
+			wp_manager.addWaypoint(MAV_CMD_NAV_LAND, 1, 0, 0, 0, 0);
+			*/
+
+			// The Baseball fields at GGPark, monocole interview
+			/*
+			wp_manager.clearWaypoints();
+			wp_manager.lat_offset = 377679251;
+			wp_manager.lng_offset = -1224646698;
+			wp_manager.addWaypoint(22, 0, 0, 251, 377679251, -1224646698);
+			wp_manager.addWaypoint(16, 0, 0, 251, 377679251, -1224646698);
+			wp_manager.addWaypoint(16, 0, 0, 535, 377674240, -1224646056);
+			wp_manager.addWaypoint(16, 0, 0, 749, 377678506, -1224646730);//
+			wp_manager.addWaypoint(16, 0, 0, 647, 377680200, -1224641799);
+			wp_manager.addWaypoint(16, 0, 0, 720, 377678907, -1224648277);
+			wp_manager.addWaypoint(16, 0, 0, 375, 377678559, -1224646056);
+			wp_manager.addWaypoint(21, 0, 0, -265, 377678411, -1224645601);
+			//*/
+
+
+			/*
+			//Tilt test
+			wp_manager.clearWaypoints();
+			wp_manager.lat_offset =  	0; //y
+			wp_manager.lng_offset =    	0; // x
+			wp_manager.addWaypoint(22, 0, 0, 	1000, 0, 0);				// 1 takeoff to 10m
+			wp_manager.addWaypoint(16, 0, 10, 	1000, 1000, 	-1000); 	// 2 go to this wp, wait 30 seconds
+			wp_manager.addWaypoint(18, 0, 2, 	1000, 	1,  		1);		// 3 go to this wp, circle twice
+			//CMD, 8, 3, 18, 0, 2, 1000, 1, 1
+
+								//     op p1   alt    lat          lng
+			wp_manager.addWaypoint(19, 0, 0, 	1000,  1000,  		1);		// 4 go to this wp, Loiter 10 s
+			wp_manager.addWaypoint(16, 0, 0, 	1000,  0, 			0);		// 5 go to this wp
+			//wp_manager.addWaypoint(16, 0, 0, 1000, 2000, 2000);			//  go to this wp
+			wp_manager.addWaypoint(115, 0, 1, 720, 45, 1);					// 6 do condition yaw angle: speed, direction (-1,1), rel (1), abs (0),
+			//wp_manager.addWaypoint(16, 0, 0, 1000, 1, 1);
+			wp_manager.addWaypoint(20, 0, 0, 0, 0, 0);						// 7 RTL
+			*/
+			// AP Command enumeration
+			/*
+			public const MAV_CMD_NAV_WAYPOINT			:int = 16;
+			public const MAV_CMD_NAV_LOITER_UNLIM		:int = 17;
+			public const MAV_CMD_NAV_LOITER_TURNS		:int = 18;
+			public const MAV_CMD_NAV_LOITER_TIME		:int = 19;
+			public const MAV_CMD_NAV_RETURN_TO_LAUNCH	:int = 20;
+			public const MAV_CMD_NAV_LAND				:int = 21;
+			public const MAV_CMD_NAV_TAKEOFF			:int = 22;
+			public const MAV_CMD_NAV_LAST				:int = 95;
+
+			public const MAV_CMD_CONDITION_DELAY		:int = 112;
+			public const MAV_CMD_CONDITION_DISTANCE		:int = 114;
+			public const MAV_CMD_CONDITION_CHANGE_ALT	:int = 113;
+			public const MAV_CMD_CONDITION_YAW			:int = 115;
+			public const MAV_CMD_CONDITION_LAST			:int = 159;
+
+			public const MAV_CMD_DO_JUMP				:int = 177;
+			public const MAV_CMD_DO_CHANGE_SPEED		:int = 178;
+			public const MAV_CMD_DO_SET_HOME			:int = 179;
+			public const MAV_CMD_DO_SET_SERVO			:int = 183;
+			public const MAV_CMD_DO_SET_RELAY			:int = 181;
+			public const MAV_CMD_DO_REPEAT_SERVO		:int = 184;
+			public const MAV_CMD_DO_REPEAT_RELAY		:int = 182;
+			public const MAV_CMD_DO_SET_ROI				:int = 201;
+
+			public const MAV_ROI_NONE					:int = 0;
+			public const MAV_ROI_WPNEXT					:int = 1;
+			public const MAV_ROI_WPINDEX				:int = 2;
+			public const MAV_ROI_LOCATION				:int = 3;
+			public const MAV_ROI_TARGET					:int = 4;
+			public const MAV_ROI_ENUM_END				:int = 5;
+			*/
+			/*
+			wp_manager.clearWaypoints();
+			wp_manager.lat_offset =  397151280;
+			wp_manager.lng_offset = -1052041650;
+			wp_manager.addWaypoint(22, 1, 0, 1000, 0, 0);
+									//  o  p1  alt	lat			lon
+			wp_manager.addWaypoint(16, 1, 0, 1000, 397152600, -1052041650);
+			wp_manager.addWaypoint(16, 1, 0, 1000, 397154624, -1052041650);
+
+			wp_manager.addWaypoint(16, 1, 0, 2000, 397155104, -1052037184);
+			wp_manager.addWaypoint(16, 1, 0, 3000, 397145312, -1052032704);
+			wp_manager.addWaypoint(16, 1, 0, 4000, 397143200, -1052018496);
+			wp_manager.addWaypoint(16, 1, 0, 2000, 397133056, -1052002816);
+			wp_manager.addWaypoint(16, 1, 0, 2000, 397131072, -1052004992);
+			wp_manager.addWaypoint(16, 1, 0, 2000, 397133376, -1052008512);
+			wp_manager.addWaypoint(16, 1, 0, 2000, 397130496, -1052011712);
+			wp_manager.addWaypoint(16, 1, 0, 2000, 397136864, -1052021696);
+			wp_manager.addWaypoint(16, 1, 0, 4000, 397139040, -1052023232);
+			wp_manager.addWaypoint(16, 1, 0, 4000, 397149344, -1052028288);
+			wp_manager.addWaypoint(16, 1, 0, 600, 397151296, -1052042112);
+			wp_manager.addWaypoint(16, 1, 0, 5000, 397161472, -1052046656);
+			wp_manager.addWaypoint(16, 1, 0, 5000, 397163936, -1052050368);
+			wp_manager.addWaypoint(16, 1, 0, 5000, 397162080, -1052052352);
+			wp_manager.addWaypoint(16, 1, 0, 5000, 397159648, -1052048896);
+			wp_manager.addWaypoint(16, 1, 0, 4000, 397157376, -1052051328);
+			wp_manager.addWaypoint(16, 1, 0, 2000, 397155616, -1052037952);
+			wp_manager.addWaypoint(16, 1, 0, 800, 397151712, -1052042304);
+			wp_manager.addWaypoint(16, 1, 0, 500, 397154496, -1052042752);
+			wp_manager.addWaypoint(16, 1, 0, 800, 397154592, -1052042112);
+			wp_manager.addWaypoint(21, 1, 0, 0, 0, 0);
+			*/
