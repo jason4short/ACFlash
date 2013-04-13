@@ -2,7 +2,7 @@
 			// Setup waypoints
 			// ------------------------------------------------------
 
-			/*
+			///*
 			// The Baseball fields at GGPark
 			wp_manager.clearWaypoints();
 			wp_manager.lat_offset = 377679650;
@@ -21,7 +21,8 @@
 			//*/
 
 
- 
+ 			/*
+ 			// SParkfun contest 2013
 			wp_manager.clearWaypoints();
 			wp_manager.lat_offset = 400728660;
 			wp_manager.lng_offset = -1052305390;
@@ -36,7 +37,8 @@
 			wp_manager.addWaypoint(16, 1, 0, 330, 400727000, -1052313000);	// descend
 			wp_manager.addWaypoint(16, 1, 0, 330, 400728660, -1052305390); // Home
 			wp_manager.addWaypoint(21, 1, 0, 0, 0, 0);
-
+			*/
+			
 			/*
 			// A Basic 40m square for testing
 			wp_manager.clearWaypoints();
