@@ -37,6 +37,7 @@ package com.Sim {
 		public var scale		:Number = .5;
 
 		public var line				:MovieClip;
+		public var tracks				:MovieClip;
 		
 		private const SMALL_X 		:int = 1000;
 		private const SMALL_Y 		:int = 200;
@@ -45,6 +46,7 @@ package com.Sim {
 		private const LARGE_Y 		:int = 400;
 		private const LONSCALE 		:Number = 1//.123;
 		public var wp_nav			:AC_WPNav;
+		private var counter			:int = 0;
 
 
 public const LATLON_TO_CM 					:Number = 1.113195;
@@ -81,7 +83,7 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 			this.y = LARGE_Y;
 		}
 
-		public function draw():void
+		public function draw(recordTrack:Boolean):void
 		{
 			//             c           	|     	n
 			//            -40		   	0		20
@@ -104,8 +106,8 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 			gps.x = (controller.g_gps.longitude - copter.true_loc.lng) * LONSCALE;
 			gps.y = (-controller.g_gps.latitude) - copter_XY.y;
 
-			//prevwp_XY.x 	= controller.prev_WP.lng * LONSCALE - copter_XY.x;
-			//prevwp_XY.y 	= (-controller.prev_WP.lat) - copter_XY.y;
+			prevwp_XY.x 	= controller.pv_get_lon(wp_nav._origin) - copter_XY.x;
+			prevwp_XY.y 	= (-controller.pv_get_lat(wp_nav._origin)) - copter_XY.y;
 
 			nextwp_XY.x 	= controller.pv_get_lon(wp_nav._destination) - copter_XY.x;
 			nextwp_XY.y 	= (-controller.pv_get_lat(wp_nav._destination)) - copter_XY.y;
@@ -146,6 +148,12 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 			target_.y *= scale;
 			*/
 
+			if(recordTrack && (counter >= 25)){
+				counter = 0;
+				tracks.graphics.lineTo(copter_XY.x, copter_XY.y);
+			}else{
+				counter++;
+			}
 
 			line.graphics.clear();
 			line.graphics.lineStyle(2, 0x000000);
@@ -155,6 +163,9 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 			line.graphics.lineStyle(2, 0xFF7C00);
 			line.graphics.moveTo(copter_mc.x, copter_mc.y);
 			line.graphics.lineTo(wp_target_mc.x/ LATLON_TO_CM, wp_target_mc.y/ LATLON_TO_CM);
+			tracks.x = -copter_XY.x;
+			tracks.y = -copter_XY.y;
+			
 		}
 
 
@@ -170,6 +181,16 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 			//draw();
 			line = new MovieClip()
 			addChildAt(line, 3);
+			tracks = new MovieClip()
+			addChild(tracks);
+		}
+
+		public function clearTracks():void
+		{
+			tracks.graphics.clear();
+			tracks.graphics.lineStyle(1, 0x006666);
+			tracks.graphics.moveTo(copter_mc.x, copter_mc.y);
+			counter = 0;
 		}
 
 		public function degrees(r:Number):Number

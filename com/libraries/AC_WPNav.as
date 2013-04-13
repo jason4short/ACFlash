@@ -64,6 +64,16 @@ package com.libraries {
 		public var _vert_track_scale	:Number;    // horizontal component of track to next waypoint
 		public var _reached_destination	:Boolean;    // vertical component of track to next waypoint
 
+
+
+		public var p_loiter_lon_rate		:Number = 0;
+		public var i_loiter_lon_rate		:Number = 0;
+		public var d_loiter_lon_rate		:Number = 0;
+
+		public var p_loiter_lat_rate		:Number = 0;
+		public var i_loiter_lat_rate		:Number = 0;
+		public var d_loiter_lat_rate		:Number = 0;
+		
 		// pilot inputs for loiter
 		public var _pilot_vel_forward_cms	:int;
 		public var _pilot_vel_right_cms	:int;
@@ -437,7 +447,7 @@ public function get_loiter_pos_lat_lon(target_lat_from_home:Number, target_lon_f
         vel_sqrt = constrain(Math.sqrt(2 * MAX_LOITER_POS_ACCEL * (dist_error_total - linear_distance)), 0, 1000);
         desired_vel.x = vel_sqrt * dist_error.x / dist_error_total;
         desired_vel.y = vel_sqrt * dist_error.y / dist_error_total;
-        trace("desired_vel", desired_vel.x.toFixed(1), desired_vel.y.toFixed(1));
+        //trace("desired_vel", desired_vel.x.toFixed(1), desired_vel.y.toFixed(1));
     }else{
         desired_vel.x = _pid_pos_lat.get_p(dist_error.x);
         desired_vel.y = _pid_pos_lon.get_p(dist_error.y);
@@ -479,14 +489,24 @@ public function get_loiter_vel_lat_lon(vel_lat:Number, vel_lon:Number, dt:Number
     vel_error.y = vel_lon - vel_curr.y;
 	//trace("vel_error", vel_error, vel_curr)
     // combine feed foward accel with PID outpu from velocity error
-    desired_accel.x += _pid_rate_lat.get_pid(vel_error.x, dt);
-    desired_accel.y += _pid_rate_lon.get_pid(vel_error.y, dt);
+
+    p_loiter_lon_rate = _pid_rate_lon.get_p(vel_error.y);
+    i_loiter_lon_rate = _pid_rate_lon.get_i(vel_error.y, dt);
+    d_loiter_lon_rate = _pid_rate_lon.get_d(vel_error.y, dt);
+
+    p_loiter_lat_rate = _pid_rate_lat.get_p(vel_error.x);
+    i_loiter_lat_rate = _pid_rate_lat.get_i(vel_error.x, dt);
+    d_loiter_lat_rate = _pid_rate_lat.get_d(vel_error.x, dt);
+
+
+    desired_accel.x += (p_loiter_lat_rate + i_loiter_lat_rate + d_loiter_lat_rate);
+    desired_accel.y += (p_loiter_lon_rate + i_loiter_lon_rate + d_loiter_lon_rate);
 
     // scale desired acceleration if it's beyond acceptable limit
     accel_total = Math.sqrt(desired_accel.x * desired_accel.x + desired_accel.y * desired_accel.y);
     if(accel_total > MAX_LOITER_VEL_ACCEL){
-        desired_accel.x = MAX_LOITER_VEL_ACCEL * desired_accel.x / accel_total;
-        desired_accel.y = MAX_LOITER_VEL_ACCEL * desired_accel.y / accel_total;
+        //desired_accel.x = MAX_LOITER_VEL_ACCEL * desired_accel.x / accel_total;
+        //desired_accel.y = MAX_LOITER_VEL_ACCEL * desired_accel.y / accel_total;
     }
 
     // call accel based controller with desired acceleration
