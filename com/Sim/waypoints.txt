@@ -2,7 +2,7 @@
 			// Setup waypoints
 			// ------------------------------------------------------
 
-			///*
+			/*
 			// The Baseball fields at GGPark
 			wp_manager.clearWaypoints();
 			wp_manager.lat_offset = 377679650;
@@ -20,6 +20,18 @@
 			wp_manager.addWaypoint(MAV_CMD_NAV_LAND, 1, 0, 0, 0, 0);
 			//*/
 
+			//*
+			wp_manager.clearWaypoints();
+			wp_manager.lat_offset =  	0; //y
+			wp_manager.lng_offset =    	0; // x
+			wp_manager.addWaypoint(22, 0, 0, 	500, 0, 0);				// 1 takeoff to 10m
+			wp_manager.addWaypoint(16, 0, 0, 	500, 5000, 		0); 	// 2 go to this wp, wait 30 seconds
+			wp_manager.addWaypoint(16, 0, 0, 	500, 5000,  	5000);		// 3 go to this wp, circle twice
+			wp_manager.addWaypoint(16, 0, 0, 	500,  	0,  	5000);		// 4 go to this wp, Loiter 10 s
+			wp_manager.addWaypoint(16, 0, 0, 	500,  	0, 		0);		// 5 go to this wp
+			wp_manager.addWaypoint(MAV_CMD_NAV_LAND, 1, 0, 0, 0, 0);
+			//*/
+			
 
  			/*
  			// SParkfun contest 2013
@@ -84,6 +96,7 @@
 			//wp_manager.addWaypoint(16, 0, 0, 1000, 1, 1);
 			wp_manager.addWaypoint(20, 0, 0, 0, 0, 0);						// 7 RTL
 			*/
+			
 			// AP Command enumeration
 			/*
 			public const MAV_CMD_NAV_WAYPOINT			:int = 16;
