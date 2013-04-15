@@ -63,7 +63,7 @@ package com {
 
 	// WPNAV
 	public var _speed_cms				:Number = 500;
-	public var _wp_radius_cm			:Number = 200;
+	public var _wp_radius_cm			:Number = 500;
 
 	public var rtl_altitude				:int 		= 2500; // ALT_HOLD_HOME  height to return to Home, 0 = Maintain current altitude
 	public var sonar_enabled			:Boolean 	= false;
@@ -230,6 +230,11 @@ package com {
 
 	public var time_constant_xy			:Number = 3.0;// default time constant for complementary filter's X & Y axis
 	public var time_constant_z			:Number = 7;// default time constant for complementary filter's Z axis
+
+
+	public var crosstrack_gain			:Number = .25;
+	public var tilt_comp				:int 	= 44;
+	
 
 	public function Parameters():void
 	{
@@ -429,6 +434,7 @@ package com {
 
 
 		auto_slew_rate_BI.setNumber(auto_slew_rate);
+		crosstrack_BI.setNumber(crosstrack_gain);
 
 		//toy_yaw_rate_BI.setNumber(toy_yaw_rate);
 		//toy_alt_large_BI.setNumber(toy_alt_large);
@@ -561,7 +567,8 @@ package com {
 		throttle_accel_enabled		= throttle_accel_checkbox.getSelected();
 
 		auto_slew_rate				= auto_slew_rate_BI.getNumber();
-
+		crosstrack_gain				= crosstrack_BI.getNumber();
+		
 		// data fixes
 		if(moment == 0) moment = 1;
 		if(mass == 0) mass = 1;

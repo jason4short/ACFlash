@@ -15,7 +15,7 @@ public const  MAX_YAW_OVERSHOOT		:int = 1000;
 public const  ACRO_BALANCE_ROLL		:int = 200;
 public const  ACRO_BALANCE_PITCH	:int = 200;
 
-public const  AUTO_YAW_SLEW_RATE	:int = 60;
+public const  AUTO_YAW_SLEW_RATE	:int = 30;
 // Acro Mode
 public const ACRO_YAW           	:int =  YAW_ACRO;
 public const ACRO_RP            	:int =  ROLL_PITCH_ACRO;

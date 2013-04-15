@@ -184,15 +184,6 @@ public function update_nav_mode():void
     */
 }
 
-public function check_missed_wp():Boolean
-{
-    var temp:int;
-    temp = wp_bearing - original_wp_bearing;
-    temp = wrap_180(temp);
-    if(Math.abs(temp) > 9000)
-    	trace("MISSED WP!!!");
-    return (Math.abs(temp) > 9000);         // we passed the waypoint by 90 degrees
-}
 
 // Keeps old data out of our calculation / logs
 public function reset_nav_params():void

@@ -1,4 +1,4 @@
-﻿public function loop():void
+public function loop():void
 {
 	iteration++;
 
@@ -408,7 +408,7 @@ update_yaw_mode():void
     case YAW_LOOK_AT_NEXT_WP:
         // point towards next waypoint (no pilot input accepted)
         // we don't use wp_bearing because we don't want the copter to turn too much during flight
-        nav_yaw = get_yaw_slew(nav_yaw, original_wp_bearing, AUTO_YAW_SLEW_RATE);
+       // nav_yaw = get_yaw_slew(nav_yaw, original_wp_bearing, AUTO_YAW_SLEW_RATE);
         get_stabilize_yaw(nav_yaw);
 
         // if there is any pilot input, switch to YAW_HOLD mode for the next iteration

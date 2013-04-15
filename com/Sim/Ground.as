@@ -9,6 +9,7 @@ package com.Sim {
 	import flash.display.DisplayObject;
 	import flash.events.*;
 	import flash.geom.Rectangle;
+	import flash.geom.Vector3D;
 	import flash.geom.Point;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -19,7 +20,8 @@ package com.Sim {
 	import com.Sim.Copter;
 	import com.libraries.Location;
 	import com.Main;
-	import com.libraries.AC_WPNav;
+	import com.libraries.AC_WPNav2;
+	import com.libraries.AP_InertialNav;
 
 	public class Ground extends MovieClip
 	{
@@ -31,13 +33,15 @@ package com.Sim {
 
 		//public var frame			:Rectangle;
 		public var copter			:Copter;
+		public var inertial_nav		:AP_InertialNav;
+				
 		public var ghost			:MovieClip;
 		public var controller		:Main;
 		public var current_loc		:Location;
-		public var scale		:Number = .5;
+		public var scale			:Number = .5;
 
 		public var line				:MovieClip;
-		public var tracks				:MovieClip;
+		public var tracks			:MovieClip;
 		
 		private const SMALL_X 		:int = 1000;
 		private const SMALL_Y 		:int = 200;
@@ -45,11 +49,11 @@ package com.Sim {
 		private const LARGE_X 		:int = 650;
 		private const LARGE_Y 		:int = 400;
 		private const LONSCALE 		:Number = 1//.123;
-		public var wp_nav			:AC_WPNav;
+		public var wp_nav			:AC_WPNav2;
 		private var counter			:int = 0;
 
 
-public const LATLON_TO_CM 					:Number = 1.113195;
+		public const LATLON_TO_CM 					:Number = 1.113195;
 
 		public function Ground(){
 			super();
@@ -58,7 +62,6 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 			copter_XY 		= new Point(0,0);
 			nextwp_XY 		= new Point(0,0);
 			prevwp_XY 		= new Point(0,0);
-			trace("create ground")
 			maskMe.visible = false;
 		}
 		
@@ -91,26 +94,33 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 			//             0  - -40
 			//             20 - -40
 
+		    var curr:Vector3D = inertial_nav.get_position();
 
 			nav_yaw_MC.rotation = controller.nav_yaw/100;
 
-			copter_XY.x 	= copter.true_loc.lng * LONSCALE;
-			copter_XY.y 	= -copter.true_loc.lat;
+			copter_XY.x 	= copter.position.x;
+			copter_XY.y 	= -copter.position.y;
 
-			wp_target_mc.x = controller.pv_get_lon(wp_nav._target )- copter_XY.x;
-			wp_target_mc.y = -controller.pv_get_lat(wp_nav._target )- copter_XY.y;
+			wp_target_mc.x = wp_nav._target.y - copter_XY.x;
+			wp_target_mc.y = -wp_nav._target.x - copter_XY.y;
 
-			loc.x = (controller.current_loc.lng - copter.true_loc.lng) * LONSCALE;
-			loc.y = (-controller.current_loc.lat) - copter_XY.y;
+			//loc.x = (controller.current_loc.lng - copter.true_loc.lng) * LATLON_TO_CM;
+			//loc.y = (-controller.current_loc.lat) - copter_XY.y;
 
-			gps.x = (controller.g_gps.longitude - copter.true_loc.lng) * LONSCALE;
-			gps.y = (-controller.g_gps.latitude) - copter_XY.y;
+			loc.x = curr.y - copter.position.x; // East
+			loc.y = curr.x - copter.position.y; // North
 
-			prevwp_XY.x 	= controller.pv_get_lon(wp_nav._origin) - copter_XY.x;
-			prevwp_XY.y 	= (-controller.pv_get_lat(wp_nav._origin)) - copter_XY.y;
+			gps.x = (controller.g_gps.longitude * LATLON_TO_CM) - copter.position.x;
+			gps.y = -((controller.g_gps.latitude * LATLON_TO_CM) - copter.position.y);
 
-			nextwp_XY.x 	= controller.pv_get_lon(wp_nav._destination) - copter_XY.x;
-			nextwp_XY.y 	= (-controller.pv_get_lat(wp_nav._destination)) - copter_XY.y;
+			//wp_nav._prev Vector3D(0, 0, 500) (x=19.47424604666384, y=-442.53393665794965)
+			
+			prevwp_XY.x 	= wp_nav._prev.y - copter.position.x;
+			prevwp_XY.y 	= -(wp_nav._prev.x - copter.position.y);
+
+			//Vector3D(5565.974999999999, 0, 500) (x=14.519686996651958, y=-448.674346006199)
+			nextwp_XY.x 	= wp_nav._destination.y - copter.position.x;
+			nextwp_XY.y 	= -(wp_nav._destination.x - copter.position.y);
 
 
 			grass.x = -copter_XY.x % 200 + 50;
@@ -171,8 +181,6 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 
 		public function addedToStage(event:Event):void
 		{
-					trace("added ground to stage")
-
 			//this.frame.width 	= Math.round(_preview.width);
 			//this.frame.height 	= Math.round(_preview.height);
 			_preview.visible = false;
@@ -187,7 +195,7 @@ public const LATLON_TO_CM 					:Number = 1.113195;
 
 		public function clearTracks():void
 		{
-			tracks.graphics.clear();
+			//tracks.graphics.clear();
 			tracks.graphics.lineStyle(1, 0x006666);
 			tracks.graphics.moveTo(copter_mc.x, copter_mc.y);
 			counter = 0;

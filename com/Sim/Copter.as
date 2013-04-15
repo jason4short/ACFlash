@@ -61,7 +61,8 @@
 		private var _jump_z					:Number 	= 0;
 
 		private var v3:Vector.<Vector3D>;
-
+		private const AP_INERTIALNAV_LATLON_TO_CM:Number 				= 1.1113175;
+		
 		public function Copter():void
 		{
 			APM_RC			= AP_RC.getInstance();
@@ -349,8 +350,8 @@
 			ahrs.yaw_sensor 	=  Math.floor(degrees(v3[1].z) * 100);
 
 			// store the position for the GPS object
-			true_loc.lng = position.x;
-			true_loc.lat = position.y;
+			true_loc.lng = position.x / AP_INERTIALNAV_LATLON_TO_CM;
+			true_loc.lat = position.y / AP_INERTIALNAV_LATLON_TO_CM;
 			true_loc.alt = position.z;
 		}
 
