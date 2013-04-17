@@ -243,7 +243,8 @@ public function do_takeoff():void
     var pos:Vector3D = inertial_nav.get_position();
     pos.z = command_nav_queue.alt;
     wp_nav.set_destination(pos);
-
+	trace("wp_nav.set_destination", pos);
+	
 	// prevent flips
 	// To-Do: check if this is still necessary
 	reset_I_all();
@@ -473,7 +474,7 @@ public function verify_loiter_time():Boolean
 	}
 
     // check if loiter timer has run out
-    return ((clock.millis() - loiter_time) > loiter_time_max);
+    return (((clock.millis() - loiter_time) / 1000) >= loiter_time_max);
 }
 
 // verify_circle - check if we have circled the point enough
@@ -736,7 +737,7 @@ public function verify_nav_roi():Boolean
 
 public function do_change_speed():void
 {
-	g.waypoint_speed_max = command_cond_queue.p1 * 100;
+	wp_nav.set_horizontal_velocity(command_cond_queue.p1 * 100);
 }
 
 
