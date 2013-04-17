@@ -10,6 +10,7 @@ public function default_dead_zones():void
 	g.rc_2.set_dead_zone(60);
 	g.rc_3.set_dead_zone(60);
 	g.rc_4.set_dead_zone(80);
+	g.rc_6.set_dead_zone(0);
 }
 
 public function init_rc_in():void
