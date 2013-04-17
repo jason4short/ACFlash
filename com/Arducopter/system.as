@@ -48,6 +48,9 @@ private function air_start():void
 	read_radio();
 
 	init_arm_motors();
+	
+	// auto Arm
+    motors.auto_arm(true);
 
 	// fix filters
 	//baro_alt			= copter.position.z;
@@ -63,10 +66,15 @@ private function air_start():void
 	nwp.lat 			= 0;
 	nwp.alt 			= g.target_altitude_BI.getNumber();
 
+
+	oldSwitchPosition = -1
+	read_control_switch();
+
 	// hack to make the SIM go right into Land
 	if(control_mode == LAND)
 		do_land();
-
+	
+	
 
 	if(copter.position.z > 0){
 		// force out decent values to the motors

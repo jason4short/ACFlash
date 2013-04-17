@@ -1282,34 +1282,45 @@ package com {
 					// Flight modes
 					// --------------------------------------------------------------------------
 					case 48: // 0
-						set_mode(STABILIZE);
+						modeMenu.setSelectedIndex(STABILIZE);
+						radio_switch_position = STABILIZE;
 						break;
 					case 49: // 1
-						set_mode(ACRO);
+						modeMenu.setSelectedIndex(ACRO);
+						radio_switch_position = ACRO;
 						break;
 					case 50: // 2
-						set_mode(ALT_HOLD);
+						modeMenu.setSelectedIndex(ALT_HOLD);
+						radio_switch_position = ALT_HOLD;
 						break;
 					case 51: // 3
-						set_mode(AUTO);
+						//set_mode(AUTO);
+						modeMenu.setSelectedIndex(AUTO);
+						radio_switch_position = AUTO;
 						break;
 					case 52: // 4
-						set_mode(GUIDED);
+						modeMenu.setSelectedIndex(GUIDED);
+						radio_switch_position = GUIDED;
 						break;
 					case 53: // 5
-						set_mode(LOITER);
+						modeMenu.setSelectedIndex(LOITER);
+						radio_switch_position = LOITER;
 						break;
 					case 54: // 6
-						set_mode(RTL);
+						modeMenu.setSelectedIndex(RTL);
+						radio_switch_position = RTL;
 						break;
 					case 55: // 7
-						set_mode(CIRCLE);
+						modeMenu.setSelectedIndex(CIRCLE);
+						radio_switch_position = CIRCLE;
 						break;
 					case 56: // 8
-						set_mode(POSITION);
+						modeMenu.setSelectedIndex(POSITION);
+						radio_switch_position = POSITION;
 						break;
 					case 57: // 9
-						set_mode(LAND);
+						modeMenu.setSelectedIndex(LAND);
+						radio_switch_position = LAND;
 						break;
 
 					// --------------------------------------------------------------------------
@@ -1422,7 +1433,6 @@ package com {
 			modeMenu.setLabel(item.getLabel());
 			if(e != null)
 				radio_switch_position = modeMenu.getSelectedIndex();
-			//set_mode(modeMenu.getSelectedIndex());
 		}
 
 		private function armHandler(e:Event):void
