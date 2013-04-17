@@ -115,8 +115,8 @@ package com.Sim {
 
 			//wp_nav._prev Vector3D(0, 0, 500) (x=19.47424604666384, y=-442.53393665794965)
 			
-			prevwp_XY.x 	= wp_nav._prev.y - copter.position.x;
-			prevwp_XY.y 	= -(wp_nav._prev.x - copter.position.y);
+			prevwp_XY.x 	= wp_nav._origin.y - copter.position.x;
+			prevwp_XY.y 	= -(wp_nav._origin.x - copter.position.y);
 
 			//Vector3D(5565.974999999999, 0, 500) (x=14.519686996651958, y=-448.674346006199)
 			nextwp_XY.x 	= wp_nav._destination.y - copter.position.x;
