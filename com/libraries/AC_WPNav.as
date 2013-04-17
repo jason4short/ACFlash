@@ -13,23 +13,22 @@ package com.libraries {
 
 		public var clock:Clock;
 		// maximum velocity that our position controller will request.  should be 1.5 ~ 2.0 times the pilot input's max velocity.  To - Do: make consistent with maximum velocity requested by pilot input to loiter
-		public const MAX_LOITER_POS_VELOCITY         :int = 1200   	
-		
+		public const MAX_LOITER_POS_VELOCITY        :int = 500   	
 		// defines the velocity vs distant curve.  maximum acceleration in cm/s/s that loiter position controller asks for from acceleration controller
-		public const MAX_LOITER_POS_ACCEL            :int = 250
-		
+		public const MAX_LOITER_POS_ACCEL           :int = 250
 		// max acceleration in cm / s that the loiter velocity controller will ask from the lower accel controller.
-		public const MAX_LOITER_VEL_ACCEL            :int = 400     
+		public const MAX_LOITER_VEL_ACCEL           :int = 800
 		// should be 1.5 times larger than MAX_LOITER_POS_ACCEL.
-		// max acceleration = max lean angle * 980 * pi / 180.  i.e. 23deg * 980 * 3.141 / 180 = 393 cm/s/s
+		// max acceleration = max lean angle * 980 *pi / 180.  i.e. 23deg * 980 * 3.141 / 180 = 393 cm/s/s
+		public const MAX_LEAN_ANGLE                 :int = 4500        	// default maximum lean angle
 		
-		public const MAX_LOITER_OVERSHOOT            :int = 531        // maximum distance (in cm) that we will allow the target loiter point to be from the current location when switching into loiter
-		//public const WPINAV_MAX_POS_ERROR            :Number = 531.25     // maximum distance (in cm) that the desired track can stray from our current location.
-		public const WPINAV_MAX_POS_ERROR            :Number = 1000.00     // maximum distance (in cm) that the desired track can stray from our current location.
-		public const MAX_LEAN_ANGLE                  :int = 4500        // default maximum lean angle
-		public const MAX_CLIMB_VELOCITY              :int = 125         // maximum climb velocity - ToDo: pull this in from main code
-		public const WPINAV_MAX_ALT_ERROR            :Number = 100.0;      // maximum distance (in cm) that the desired track can stray from our current location.
-		public const AP_INTERTIALNAV_GRAVITY:Number		= 9.80665;
+		public const MAX_LOITER_OVERSHOOT           :int = 531        	// maximum distance (in cm) that we will allow the target loiter point to be from the current location when switching into loiter
+		//public const WPINAV_MAX_POS_ERROR         :Number = 531.25    // maximum distance (in cm) that the desired track can stray from our current location.
+		public const WPINAV_MAX_POS_ERROR           :Number = 531.25    // maximum distance (in cm) that the desired track can stray from our current location.
+
+		public const MAX_CLIMB_VELOCITY             :int = 125         	// maximum climb velocity - ToDo: pull this in from main code
+		public const WPINAV_MAX_ALT_ERROR           :Number = 100.0;    // maximum distance (in cm) that the desired track can stray from our current location.
+		public const AP_INTERTIALNAV_GRAVITY		:Number	= 9.80665;
 
 		// pointers to inertial nav library
 		public var _inav			:AP_InertialNav;
@@ -44,7 +43,8 @@ package com.libraries {
 		//public var _speed_cms		:Number;    // default horizontal speed in cm / s
 		public var _speedz_cms		:Number;    // max vertical climb rate in cm / s.  To - Do: rename or pull this from main code
 		//public var _wp_radius_cm	:Number;      // distance from a waypoint in cm that, when crossed, indicates the wp has been reached
-		public var _last_update		:int;		// time of last update call
+		public var _loiter_last_update		:int;		// time of last update call
+		public var _wpnav_last_update		:int;		// time of last update call
 		public var _cos_yaw			:Number;    // short - cut to save on calcs required to convert roll - pitch frame to lat - lon frame
 		public var _sin_yaw			:Number;
 		public var  _cos_roll		:Number;
@@ -53,6 +53,11 @@ package com.libraries {
 		public var _desired_roll		:int;   // fed to stabilize controllers at 50hz
 		public var _desired_pitch		:int;   // fed to stabilize controllers at 50hz
 		public var _desired_altitude	:int;   // fed to alt hold controller at 50hz
+
+		public var dist_error 			:Point;                // distance error calculated by loiter controller
+		public var desired_vel			:Point;               // loiter controller desired velocity
+		public var desired_accel		:Point;             // the resulting desired acceleration
+    
 
 		public var _lean_angle_max	:int;        // maximum lean angle.  can we set from main code so that throttle controller can stop leans that cause copter to lose altitude
 
@@ -105,6 +110,10 @@ package com.libraries {
 			_pos_delta_unit	= new Vector3D();
 			_prev			= new Vector3D();
 
+			dist_error		= new Point();
+			desired_vel		= new Point();
+			desired_accel	= new Point();
+
 			g = Parameters.getInstance();
 		}
 
@@ -113,13 +122,8 @@ package com.libraries {
     /// get_loiter_target - get loiter target as position vector (from home in cm)
     public function get_loiter_target():Vector3D { return _target; }
 
-    /// get_target_alt - get loiter's target altitude
-    public function get_target_alt():Number { return _target.z; }
-
     /// set_loiter_target in cm from home
-    public function set_loiter_target(position:Vector3D):void { 
-    	_target = position;
-    }
+    public function set_loiter_target(position:Vector3D) { _target = position.clone(); }
 
 
     /// set_angle_limit - limits maximum angle in centi-degrees the copter will lean
@@ -131,17 +135,19 @@ package com.libraries {
     /// get_angle_limit - retrieve maximum angle in centi-degrees the copter will lean
     public function get_angle_limit():int { return _lean_angle_max; }
 
-
+    ///
+    /// waypoint controller
+    ///
 		
 	/// get_destination waypoint using position vector (distance from home in cm)
 	public function get_destination():Vector3D { return _destination; }
-
-	/// get_destination_alt - get target altitude above home in cm
-	public function get_destination_alt():Number { return _destination.z; }
-
-		/// set_destination_alt - set target altitude above home in cm
-	public function set_destination_alt(altitude_in_cm:Number){ _destination.z = altitude_in_cm; }
 	
+	public function reached_destination():Boolean { return _reached_destination; }
+	
+    ///
+    /// shared methods
+    ///
+
 	public function get_desired_roll():int { return _desired_roll; };
 	public function get_desired_pitch():int { return _desired_pitch; };
 
@@ -150,10 +156,7 @@ package com.libraries {
 
 
     /// set_desired_alt - set desired altitude (in cm above home)
-    public function set_desired_alt(desired_alt:Number):void {
-    	//trace(_target.z);
-    	_target.z = desired_alt; 
-    }
+    public function set_desired_alt(desired_alt:Number):void {_target.z = desired_alt;}
 
 	/// set_cos_sin_yaw - short-cut to save on calculations to convert from roll-pitch frame to lat-lon frame
 	public function set_cos_sin_yaw(cos_yaw:Number, sin_yaw:Number, cos_roll:Number):void
@@ -163,8 +166,14 @@ package com.libraries {
 		_cos_roll = cos_roll;
 	}
 
+    /// set_horizontal_velocity - allows main code to pass target horizontal velocity for wp navigation
+    public function set_horizontal_velocity(velocity_cms:Number) { g._speed_cms = velocity_cms; };
+
 	/// set_climb_velocity - allows main code to pass max climb velocity to wp navigation
 	public function set_climb_velocity(velocity_cms:Number):void { _speedz_cms = velocity_cms; };
+
+    public function get_waypoint_radius():Number { return g._wp_radius_cm; }
+
 
 
 
@@ -172,17 +181,18 @@ package com.libraries {
 
 
 /// set_loiter_target - set initial loiter target based on current position and velocity
-public function set_loiter_target_vel(position:Vector3D, velocity:Vector3D):void
+public function project_stopping_point(position:Vector3D, velocity:Vector3D):Vector3D
 {
+	
 	var linear_distance	:Number;      // half the distace we swap between linear and sqrt and the distace we offset sqrt.
 	var linear_velocity	:Number;      // the velocity we swap between linear and sqrt.
 	var vel_total		:Number;
 	var target_dist		:Number;
+	var target			:Vector3D = new Vector3D();
 
     // avoid divide by zero
     if(_pid_pos_lat.kP() <= 0.1){
-        set_loiter_target(position);
-        return;
+        return(position);
     }
 
     // calculate point at which velocity switches from linear to sqrt
@@ -198,15 +208,26 @@ public function set_loiter_target_vel(position:Vector3D, velocity:Vector3D):void
         linear_distance = MAX_LOITER_POS_ACCEL / (2 * _pid_pos_lat.kP() * _pid_pos_lat.kP());
         target_dist = linear_distance + (vel_total * vel_total) / (2 * MAX_LOITER_POS_ACCEL);
     }
+    
+
     target_dist = constrain(target_dist, 0, MAX_LOITER_OVERSHOOT);
 
-	if(vel_total == 0){
-	    _target.x = position.x;
-    	_target.y = position.y;
-	}else{
-	    _target.x = position.x + (target_dist * velocity.x / vel_total);
-    	_target.y = position.y + (target_dist * velocity.y / vel_total);
-	}
+	// Avoid div/0!
+	if(vel_total == 0) vel_total = 1; 
+
+
+    target.x = position.x + (target_dist * velocity.x / vel_total);
+    target.y = position.y + (target_dist * velocity.y / vel_total);
+    target.z = position.z;
+    return target;
+}
+
+/// set_loiter_target - set initial loiter target based on current position and velocity
+public function set_loiter_target_vel(position:Vector3D, velocity:Vector3D):void
+{
+	var target:Vector3D = project_stopping_point(position, velocity);
+    _target.x = target.x;
+    _target.y = target.y;
 }
 
 /// move_loiter_target - move loiter target by velocity provided in front/right directions in cm/s
@@ -286,21 +307,20 @@ public function get_bearing_to_target():int
 public function update_loiter():void
 {
     var now:int = clock.millis();
-    var dt:Number = (now - _last_update) / 1000.0;
-    _last_update = now;
+    var dt:Number = (now - _loiter_last_update) / 1000.0;
+    _loiter_last_update = now;
 
     // catch if we've just been started
     if(dt >= 1.0){
         dt = 0.0;
         reset_I();
-        _target_vel.x = 0;
-        _target_vel.y = 0;
     }
+
     // translate any adjustments from pilot to loiter target
     translate_loiter_target_movements(dt);
     
     // run loiter position controller
-    get_loiter_pos_lat_lon(_target.x, _target.y, dt);
+    get_loiter_position_to_velocity(dt);
 }
 
 ///
@@ -309,26 +329,33 @@ public function update_loiter():void
 
 /// set_destination - set destination using cm from home
 public function set_destination(destination:Vector3D):void
-{
-	_prev = _destination.clone();
-	_prev.z = _inav.get_position().z;
-    // To-Do: use projection of current position & velocity to set origin
-   // set_origin_and_destination(_inav.get_position(), destination);
-    set_origin_and_destination(_prev, destination);
+{	
+	var origin:Vector3D;
+    // if waypoint controlls is active and copter has reached the previous waypoint use it for the origin
+    if(_reached_destination && ((clock.millis() - _wpnav_last_update) < 1000)){
+        origin = _destination.clone();
+    }else{
+        // otherwise calculate origin from the current position and velocity
+        origin = project_stopping_point(_inav.get_position(), _inav.get_velocity());
+    }
+
+    // set origin and destination
+    set_origin_and_destination(origin, destination);
 }
 
 /// set_origin_and_destination - set origin and destination using lat/lon coordinates
 public function set_origin_and_destination(origin:Vector3D, destination:Vector3D):void
 {
-	trace("set_origin_and_destination", origin, destination)
 	_origin = origin.clone();
     _destination = destination.clone();
 	
     _vert_track_scale = WPINAV_MAX_POS_ERROR / WPINAV_MAX_ALT_ERROR;
     var pos_delta:Vector3D = _destination.subtract(_origin);
+
     pos_delta.z = pos_delta.z * _vert_track_scale;
     _track_length = pos_delta.length;
     //_pos_delta_unit = pos_delta / _track_length;
+
     _pos_delta_unit = pos_delta.clone();
 	_pos_delta_unit.scaleBy(1/_track_length);
 
@@ -345,12 +372,6 @@ public function advance_target_along_track(velocity_cms:Number, dt:Number):void
     var track_desired_temp		:Number = _track_desired;
     var track_extra_max			:Number;
     var curr_delta_length		:Number;
-
-    // get current location
-	var curr_vel:Vector3D = _inav.get_velocity();
-	var curr_speed:Number = Math.sqrt(curr_vel.x * curr_vel.x + curr_vel.y * curr_vel.y);
-	//trace("curr_speed" , curr_speed.toFixed(0));
-	//trace("curr_speed" , curr_speed.toFixed(0), curr_vel.y.toFixed(0), curr_vel.x.toFixed(0));
 
     // get current location
     var curr_pos:Vector3D 	= _inav.get_position();
@@ -402,7 +423,6 @@ public function get_distance_to_destination():Number
     // get current location
     var curr:Vector3D = _inav.get_position();
     return Vector3D.distance(_destination, curr); 
-    //return pythagorous2(_destination.x-curr.x,_destination.y-curr.y);
 }
 
 /// get_bearing_to_destination - get bearing to next waypoint in centi-degrees
@@ -415,8 +435,8 @@ public function get_bearing_to_destination():int
 public function update_wpnav():void
 {
     var now:int = clock.millis();
-    var dt:Number = (now - _last_update) / 1000.0;
-    _last_update = now;
+    var dt:Number = (now - _wpnav_last_update) / 1000.0;
+    _wpnav_last_update = now;
 
     // catch if we've just been started
     if(dt >= 1.0){
@@ -424,12 +444,11 @@ public function update_wpnav():void
         reset_I();
     }else{
         // advance the target if necessary
-        //advance_target_along_track(g._speed_cms, dt);
-        advance_target_along_track(g.waypoint_speed_max, dt);
+        advance_target_along_track(g._speed_cms, dt);
     }
 
     // run loiter position controller
-    get_loiter_pos_lat_lon(_target.x, _target.y, dt);
+    get_loiter_position_to_velocity(dt);
 }
 
 ///
@@ -438,11 +457,9 @@ public function update_wpnav():void
 
 // get_loiter_pos_lat_lon - loiter position controller
 //     converts desired position provided as distance from home in lat/lon directions to desired velocity
-public function get_loiter_pos_lat_lon(target_lat_from_home:Number, target_lon_from_home:Number, dt:Number):void
+public function get_loiter_position_to_velocity(dt:Number):void
 {
-    var dist_error:Point = new Point();
-    var desired_vel:Point = new Point();
-    var curr:Vector3D = _inav.get_position();
+	var curr:Vector3D				= _inav.get_position();
     var dist_error_total:Number;
 
     var vel_sqrt:Number;
@@ -451,8 +468,8 @@ public function get_loiter_pos_lat_lon(target_lat_from_home:Number, target_lon_f
     var linear_distance:Number;      // the distace we swap between linear and sqrt.
 
     // calculate distance error
-    dist_error.x = target_lat_from_home - curr.x;
-    dist_error.y = target_lon_from_home - curr.y;
+    dist_error.x = _target.x - curr.x;
+    dist_error.y = _target.y - curr.y;
 
     linear_distance = MAX_LOITER_POS_ACCEL / (2 * _pid_pos_lat.kP() * _pid_pos_lat.kP()); // 125 with kp = 1
     
@@ -476,16 +493,15 @@ public function get_loiter_pos_lat_lon(target_lat_from_home:Number, target_lon_f
         desired_vel.y = MAX_LOITER_POS_VELOCITY * desired_vel.y / vel_total;
     }
 	//trace("des vel", desired_vel.x.toFixed(2), desired_vel.y.toFixed(2));
-    get_loiter_vel_lat_lon(desired_vel.x, desired_vel.y, dt);
+    get_loiter_velocity_to_acceleration(desired_vel.x, desired_vel.y, dt);
 }
 
 // get_loiter_vel_lat_lon - loiter velocity controller
 //    converts desired velocities in lat/lon frame to accelerations in lat/lon frame
-public function get_loiter_vel_lat_lon(vel_lat:Number, vel_lon:Number, dt:Number):void
+public function get_loiter_velocity_to_acceleration(vel_lat:Number, vel_lon:Number, dt:Number):void
 {
     var vel_curr:Vector3D = _inav.get_velocity();  // current velocity in cm / s
     var vel_error:Vector3D = new Vector3D();       // The velocity error in cm / s.
-    var desired_accel:Point = new Point();         // the resulting desired acceleration
     var accel_total:Number;                        // total acceleration in cm / s / s
 
 	//trace("vel_lon:", vel_lon, "vel_lat:", vel_lat);
@@ -521,7 +537,8 @@ public function get_loiter_vel_lat_lon(vel_lat:Number, vel_lon:Number, dt:Number
 
     desired_accel.x += (p_loiter_lat_rate + i_loiter_lat_rate + d_loiter_lat_rate);
     desired_accel.y += (p_loiter_lon_rate + i_loiter_lon_rate + d_loiter_lon_rate);
-	var temp:Point = desired_accel.clone();
+    
+	//var temp:Point = desired_accel.clone();
 
     // scale desired acceleration if it's beyond acceptable limit
     accel_total = Math.sqrt(desired_accel.x * desired_accel.x + desired_accel.y * desired_accel.y);
@@ -533,12 +550,12 @@ public function get_loiter_vel_lat_lon(vel_lat:Number, vel_lon:Number, dt:Number
 	//trace("noclip", desired_accel.x.toFixed(2), desired_accel.y.toFixed(2));
 	
     // call accel based controller with desired acceleration
-    get_loiter_accel_lat_lon(desired_accel.x, desired_accel.y);
+    get_loiter_acceleration_to_lean_angles(desired_accel.x, desired_accel.y);
 }
 
 // get_loiter_accel_lat_lon - loiter acceration controller
 //    converts desired accelerations provided in lat/lon frame to roll/pitch angles
-public function get_loiter_accel_lat_lon(accel_lat:Number, accel_lon:Number):void
+public function get_loiter_acceleration_to_lean_angles(accel_lat:Number, accel_lon:Number):void
 {
     var z_accel_meas:Number = -AP_INTERTIALNAV_GRAVITY * 100;    // gravity in cm / s / s
     var accel_forward:Number;
@@ -549,6 +566,7 @@ public function get_loiter_accel_lat_lon(accel_lat:Number, accel_lon:Number):voi
     // rotate accelerations into body forward-right frame
     accel_forward =  accel_lat * _cos_yaw + accel_lon * _sin_yaw;
     accel_right   = -accel_lat * _sin_yaw + accel_lon * _cos_yaw;
+    
 	//trace("get_loiter_accel_lat_lon", accel_right, accel_forward);
     // update angle targets that will be passed to stabilize controller
     _desired_roll = constrain((accel_right / (-z_accel_meas)) * (18000 / Math.PI), -_lean_angle_max, _lean_angle_max);
