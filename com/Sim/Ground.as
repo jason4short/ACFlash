@@ -20,7 +20,7 @@ package com.Sim {
 	import com.Sim.Copter;
 	import com.libraries.Location;
 	import com.Main;
-	import com.libraries.AC_WPNav2;
+	import com.libraries.AC_WPNav;
 	import com.libraries.AP_InertialNav;
 
 	public class Ground extends MovieClip
@@ -49,7 +49,7 @@ package com.Sim {
 		private const LARGE_X 		:int = 650;
 		private const LARGE_Y 		:int = 400;
 		private const LONSCALE 		:Number = 1//.123;
-		public var wp_nav			:AC_WPNav2;
+		public var wp_nav			:AC_WPNav;
 		private var counter			:int = 0;
 
 

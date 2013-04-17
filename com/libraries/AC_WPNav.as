@@ -350,7 +350,7 @@ public function advance_target_along_track(velocity_cms:Number, dt:Number):void
 	var curr_vel:Vector3D = _inav.get_velocity();
 	var curr_speed:Number = Math.sqrt(curr_vel.x * curr_vel.x + curr_vel.y * curr_vel.y);
 	//trace("curr_speed" , curr_speed.toFixed(0));
-	trace("curr_speed" , curr_speed.toFixed(0), curr_vel.y.toFixed(0), curr_vel.x.toFixed(0));
+	//trace("curr_speed" , curr_speed.toFixed(0), curr_vel.y.toFixed(0), curr_vel.x.toFixed(0));
 
     // get current location
     var curr_pos:Vector3D 	= _inav.get_position();
@@ -498,7 +498,7 @@ public function get_loiter_vel_lat_lon(vel_lat:Number, vel_lon:Number, dt:Number
         // feed forward desired acceleration calculation
         desired_accel.x = (vel_lat - _vel_last.x) / dt;
         desired_accel.y = (vel_lon - _vel_last.y) / dt;
-        trace("desired_accel", desired_accel.x.toFixed(2), "desired_vel", vel_lat.toFixed(2), "last" , _vel_last.x.toFixed(2));
+       // trace("desired_accel", desired_accel.x.toFixed(2), "desired_vel", vel_lat.toFixed(2), "last" , _vel_last.x.toFixed(2));
     }
     
     // store this iteration's velocities for the next iteration

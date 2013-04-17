@@ -21,7 +21,7 @@ package com.Sim {
 	import com.libraries.AP_Baro;
 	import com.libraries.GPS;
 	import com.Main;
-	import com.libraries.AC_WPNav2;
+	import com.libraries.AC_WPNav;
 
 	public class Sky extends MovieClip
 	{
@@ -41,7 +41,7 @@ package com.Sim {
 		public var y_page			:int;
 		public var x_page_g			:int;
 		public var y_page_g			:int;
-		public var wp_nav			:AC_WPNav2;
+		public var wp_nav			:AC_WPNav;
 
 
 		public function Sky(){

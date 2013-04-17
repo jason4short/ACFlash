@@ -47,7 +47,7 @@ package com {
 
 	// Application dependencies
 	
-	import com.libraries.AC_WPNav2;
+	import com.libraries.AC_WPNav;
 	import com.libraries.AP_InertialNav;
 	import com.libraries.AP_Buffer;
 	import com.libraries.AP_MotorsMatrix;
@@ -146,7 +146,7 @@ package com {
 		public var barometer						:AP_Baro;
 		public var sonar							:Sonar;
 		public var ahrs								:AP_AHRS;
-		public var wp_nav							:AC_WPNav2;
+		public var wp_nav							:AC_WPNav;
 		//public var wp_nav							:AC_WPNav;
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -657,8 +657,10 @@ package com {
 			m.addItem(new QuickMenuItem("hist_position_base_z",		"hist_position_base_z"));
 
 
-			m.addDivider(new QuickMenuDivider());
 
+			m.addDivider(new QuickMenuDivider());
+			
+			m.addItem(new QuickMenuItem("Accel Lon", 			"accel_lon"));
 			// AP
 			m.addItem(new QuickMenuItem("WP Distance", 			"wp_distance"));
 			m.addItem(new QuickMenuItem("X Actual Speed", 		"x_speed"));
@@ -1065,7 +1067,7 @@ package com {
 
 			//inertial_nav			= new AP_InertialNav(ahrs, barometer, g_gps);
 			inertial_nav	= new AP_InertialNav(ahrs, barometer, g_gps);
-			wp_nav			= new AC_WPNav2(inertial_nav, g.pi_loiter_lat, g.pi_loiter_lon, g.pid_loiter_rate_lat, g.pid_loiter_rate_lon);
+			wp_nav			= new AC_WPNav(inertial_nav, g.pi_loiter_lat, g.pi_loiter_lon, g.pid_loiter_rate_lat, g.pid_loiter_rate_lon);
 			sky.wp_nav = wp_nav;
 			ground.wp_nav = wp_nav;
 			ground.inertial_nav = inertial_nav;
@@ -1529,10 +1531,10 @@ package com {
 				break;
 
 
-				case "accel_lon":
+				//case "accel_lon":
 					//_scale = .1;
 					//val = accel_lon;
-				break;
+				//break;
 
 				case "accel_lat":
 					//_scale = .1;
@@ -1600,6 +1602,11 @@ package com {
 
 				case "nav_lat_rate_i":
 					val = g.pid_nav_lat.get_integrator();
+				break;
+
+				case "accel_lon":
+					val = ahrs.accel_ef.y;
+					_scale = 100;
 				break;
 
 

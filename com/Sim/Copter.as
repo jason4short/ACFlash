@@ -310,7 +310,6 @@
 			//ahrs.accel_bf.z	+= .5;
 			
 			ahrs.accel_ef = ahrs.dcm.transformVector(ahrs.accel_bf);
-			//trace(ahrs.accel_ef);
 
 			//trace(ahrs.accel.z.toFixed(2), velocity.z.toFixed(2), position.z.toFixed(2));
 

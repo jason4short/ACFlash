@@ -53,6 +53,7 @@ public const CH7_SAVE_WP 						:int = 7;
 public const CH7_MULTI_MODE 					:int = 8;
 public const CH7_CAMERA_TRIGGER 				:int = 9;
 public const CH7_SONAR 							:int = 10;
+public const CH7_ARM 							:int = 11;
 
 
 // Frame types

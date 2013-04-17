@@ -111,11 +111,6 @@ public function set_mode(mode:int):void
 	modeMenu.setSelectedIndex(mode);
 	modeMenuHandler(null);
 
-    // used to stop fly_aways
-    // set to false if we have low throttle
-    motors.auto_arm(g.rc_3.control_in > 0 || ap.failsafe_radio);
-    set_auto_armed(g.rc_3.control_in > 0 || ap.failsafe_radio);
-
     // if we change modes, we must clear landed flag
     set_land_complete(false);
 
@@ -259,6 +254,14 @@ public function set_mode(mode:int):void
 
     default:
         break;
+    }
+
+
+    // used to stop fly_aways
+    // set to false if we have low throttle
+    if(ap.manual_throttle && g.rc_3.control_in == 0){
+	    motors.auto_arm(false);
+    	set_auto_armed(false);
     }
 
     if(ap.manual_attitude) {

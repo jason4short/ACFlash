@@ -159,6 +159,9 @@ public function read_trim_switch():void
             // enable or disable the sonar
             g.sonar_enabled = ap_system.CH7_flag;
             break;
+
+        case CH7_ARM:
+            break;            
 	}
 }
 

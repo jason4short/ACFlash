@@ -226,33 +226,40 @@ public function translate_loiter_target_movements(nav_dt:Number):void
     var vel_delta_total:Number;
     var vel_max:Number;
     var vel_total:Number;
+
     // range check nav_dt
     if(nav_dt < 0){
         return;
     }
 
-    // rotate pilot input to lat/lon frame
+    // rotate pilot input to body frame
     target_vel_adj.x = (_pilot_vel_forward_cms * _cos_yaw - _pilot_vel_right_cms * _sin_yaw) - _target_vel.x;
     target_vel_adj.y = (_pilot_vel_forward_cms * _sin_yaw + _pilot_vel_right_cms * _cos_yaw) - _target_vel.y;
-
+	
     // constrain the velocity vector and scale if necessary
     vel_delta_total = Math.sqrt(target_vel_adj.x * target_vel_adj.x + target_vel_adj.y * target_vel_adj.y);
-    vel_max = MAX_LOITER_POS_ACCEL * nav_dt;
+	
+	trace("_target_vel", _target_vel.y.toFixed(0),_target_vel.x.toFixed(0),  target_vel_adj.y.toFixed(0), target_vel_adj.x.toFixed(0));
+	
+    ///*
+    vel_max = MAX_LOITER_POS_ACCEL * nav_dt; // vel_max = 25 (250 * .1)
+
     if(vel_delta_total >  vel_max){
         target_vel_adj.x = vel_max * target_vel_adj.x / vel_delta_total;
         target_vel_adj.y = vel_max * target_vel_adj.y / vel_delta_total;
     }
+    //*/
 
     // add desired change in velocity to current target velocity
     _target_vel.x += target_vel_adj.x;
     _target_vel.y += target_vel_adj.y;
 
     // constrain the velocity vector and scale if necessary
-    vel_total = Math.sqrt(_target_vel.x * _target_vel.x + _target_vel.y * _target_vel.y);
-    if(vel_total > MAX_LOITER_POS_VELOCITY){
-        _target_vel.x = MAX_LOITER_POS_VELOCITY * _target_vel.x / vel_total;
-        _target_vel.y = MAX_LOITER_POS_VELOCITY * _target_vel.y / vel_total;
-    }
+    //vel_total = Math.sqrt(_target_vel.x * _target_vel.x + _target_vel.y * _target_vel.y);
+    //if(vel_total > MAX_LOITER_POS_VELOCITY){
+    //    _target_vel.x = MAX_LOITER_POS_VELOCITY * _target_vel.x / vel_total;
+     //   _target_vel.y = MAX_LOITER_POS_VELOCITY * _target_vel.y / vel_total;
+    //}
 
     // update target position
     _target.x += _target_vel.x * nav_dt;
@@ -424,7 +431,6 @@ public function calc_loiter_velocity():void
         vel_sqrt = constrain(Math.sqrt(2 * MAX_LOITER_POS_ACCEL * (dist_error_total - linear_distance)), 0, 1000);
         desired_vel.x = vel_sqrt * dist_error.x / dist_error_total;
         desired_vel.y = vel_sqrt * dist_error.y / dist_error_total;
-        //trace("desired_vel", desired_vel.x.toFixed(1), desired_vel.y.toFixed(1));
     }else{
         desired_vel.x = _pid_pos_lat.get_p(dist_error.x);
         desired_vel.y = _pid_pos_lon.get_p(dist_error.y);
@@ -435,8 +441,6 @@ public function calc_loiter_velocity():void
         desired_vel.x = MAX_LOITER_POS_VELOCITY * desired_vel.x / vel_total;
         desired_vel.y = MAX_LOITER_POS_VELOCITY * desired_vel.y / vel_total;
     }
-	//trace("des vel", desired_vel.x.toFixed(2), desired_vel.y.toFixed(2));
-   // get_loiter_vel_lat_lon(desired_vel.x, desired_vel.y, dt);
 }
 
 
