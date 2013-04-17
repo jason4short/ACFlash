@@ -63,7 +63,7 @@ package com {
 
 	// WPNAV
 	public var _speed_cms				:Number = 500;
-	public var _wp_radius_cm			:Number = 500;
+	public var _wp_radius_cm			:Number = 200;
 
 	public var rtl_altitude				:int 		= 2500; // ALT_HOLD_HOME  height to return to Home, 0 = Maintain current altitude
 	public var sonar_enabled			:Boolean 	= false;
@@ -87,9 +87,7 @@ package com {
     //
 	public var command_total			:int 		= 0;
 	public var command_index			:int 		= 0;
-	public var waypoint_radius			:int 		= 2;
 	public var circle_radius			:int 		= 10;
-	public var waypoint_speed_max		:int 		= 500;
 	public var rtl_loiter_time			:int 		= 5000;
 	public var land_speed				:int 		= 50;
 	public var auto_velocity_z_min		:int	 	= -125;	// minimum vertical velocity (i.e. maximum descent) the autopilot may request
@@ -216,10 +214,10 @@ package com {
 	private var loiter_p				:Number = 1.0;
 	private var loiter_i				:Number = 0.0;
 	private var loiter_imax				:Number = 3000;
-	private var loiter_rate_p			:Number = 2.0;
-	private var loiter_rate_i			:Number = 1.0;
-	private var loiter_rate_d			:Number = 0.5;
-	private var loiter_rate_imax		:Number = 3000;
+	private var loiter_rate_p			:Number = 1.0;
+	private var loiter_rate_i			:Number = 0.5;
+	private var loiter_rate_d			:Number = 0.0; // was .25
+	private var loiter_rate_imax		:Number = 400;
 
 	// Nav
 	//
@@ -418,7 +416,7 @@ package com {
 		//
 		// waypoint_radius
 		circle_radius_BI.setNumber(circle_radius);
-		waypoint_speed_max_BI.setNumber(waypoint_speed_max);
+		waypoint_speed_max_BI.setNumber(_speed_cms);
 		rtl_loiter_time_BI.setNumber(rtl_loiter_time);
 		land_speed_BI.setNumber(land_speed);
 		auto_velocity_z_min_BI.setNumber(auto_velocity_z_min);
@@ -531,7 +529,7 @@ package com {
 		pid_loiter_rate_lat._kd 	= loiter_rate_D_BI.getNumber();
 
 		// nav
-		waypoint_speed_max			= waypoint_speed_max_BI.getNumber();
+		_speed_cms					= waypoint_speed_max_BI.getNumber();
 		pid_nav_lon._kp 			= nav_P_BI.getNumber();
 		pid_nav_lon._ki 			= nav_I_BI.getNumber();
 		pid_nav_lon._imax 			= nav_Imax_BI.getNumber();
